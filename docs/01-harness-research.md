@@ -32,19 +32,21 @@
 
 ## 1. 인기 하네스 랭킹 (Star 검증값, 2026-06-11)
 
+> **출처·신뢰도 규약**: Stars/상태는 각 행의 링크된 공개 GitHub 저장소를 `checked_at: 2026-06-11`에 직접 확인한 값이다. `상태`는 active(활성)·archived(보관)·read-only(유지보수 종료) 중 하나. §1.1~1.3은 **verified(검증)**, §1.4는 **unverified(미검증, 사용자 제공)**. Star 수는 빠르게 변하므로 추세로만 본다.
+
 ### 1.1 런타임/CLI/IDE 하네스 (넓은 의미)
 
-| 순위 | 프로젝트 | Stars | 언어 | 형태 | 라이선스 |
-| --- | --- | --- | --- | --- | --- |
-| 1 | [sst/opencode](https://github.com/anomalyco/opencode) | **173k** | TypeScript | TUI + 데스크톱 + IDE | MIT |
-| 2 | [google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli) | **105k** | TypeScript | 터미널 CLI + IDE 연동 | Apache-2.0 |
-| 3 | [openai/codex](https://github.com/openai/codex) | **90.2k** | Rust | 터미널 CLI | Apache-2.0 |
-| 4 | [OpenHands/OpenHands](https://github.com/OpenHands/OpenHands) | **76.4k** | Python/TS | SDK + CLI + GUI + Cloud | MIT |
-| 5 | [cline/cline](https://github.com/cline/cline) | **63k** | TypeScript | VS Code 확장 + CLI + SDK | Apache-2.0 |
-| 6 | [block/goose](https://github.com/aaif-goose/goose) | **48.7k** | Rust | 데스크톱 + CLI + API | Apache-2.0 |
-| 7 | [Aider-AI/aider](https://github.com/Aider-AI/aider) | **46k** | Python | 터미널 페어 프로그래밍 | Apache-2.0 |
-| 8 | [continuedev/continue](https://github.com/continuedev/continue) | **33.6k** | TypeScript | VS Code/JetBrains/CLI (유지보수 종료, read-only) | Apache-2.0 |
-| 9 | [RooCodeInc/Roo-Code](https://github.com/RooCodeInc/Roo-Code) | **24.2k** | TypeScript | VS Code 확장 (2026-05 아카이브) | Apache-2.0 |
+| 순위 | 프로젝트 | Stars | 언어 | 형태 | 상태 | 라이선스 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | [anomalyco/opencode](https://github.com/anomalyco/opencode) (구 `sst/opencode`) | **173k** | TypeScript | TUI + 데스크톱 + IDE | active | MIT |
+| 2 | [google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli) | **105k** | TypeScript | 터미널 CLI + IDE 연동 | active | Apache-2.0 |
+| 3 | [openai/codex](https://github.com/openai/codex) | **90.2k** | Rust | 터미널 CLI | active | Apache-2.0 |
+| 4 | [OpenHands/OpenHands](https://github.com/OpenHands/OpenHands) | **76.4k** | Python/TS | SDK + CLI + GUI + Cloud | active | MIT |
+| 5 | [cline/cline](https://github.com/cline/cline) | **63k** | TypeScript | VS Code 확장 + CLI + SDK | active | Apache-2.0 |
+| 6 | [block/goose](https://github.com/aaif-goose/goose) | **48.7k** | Rust | 데스크톱 + CLI + API | active | Apache-2.0 |
+| 7 | [Aider-AI/aider](https://github.com/Aider-AI/aider) | **46k** | Python | 터미널 페어 프로그래밍 | active | Apache-2.0 |
+| 8 | [continuedev/continue](https://github.com/continuedev/continue) | **33.6k** | TypeScript | VS Code/JetBrains/CLI | read-only | Apache-2.0 |
+| 9 | [RooCodeInc/Roo-Code](https://github.com/RooCodeInc/Roo-Code) | **24.2k** | TypeScript | VS Code 확장 | archived (2026-05) | Apache-2.0 |
 
 ### 1.2 연구·평가(eval) 하네스 (좁은 의미)
 
@@ -76,6 +78,7 @@
 ## 2. 하네스별 심층 분석
 
 ### 2.1 opencode (173k) — "프로바이더 중립 + 클라이언트/서버"
+> 저장소가 `sst/opencode` → `anomalyco/opencode`로 이관됨(2026-06 확인). 링크는 현재 정규 URL 기준.
 - **build / plan 두 내장 에이전트를 `Tab`으로 토글**. `plan`은 읽기 전용으로 파일 편집을 거부하고 bash 실행 전 승인을 요구 → 낯선 코드베이스 탐색에 안전.
 - **`@general` 서브에이전트**: 복잡한 검색·다단계 작업을 별도 컨텍스트로 위임해 메인 대화 오염 방지.
 - **클라이언트/서버 아키텍처**: TUI는 단지 클라이언트. 덕분에 데스크톱 앱·IDE 플러그인·원격 실행을 동일 코어로 지원.
@@ -172,16 +175,18 @@ GHCP는 이미 다음을 1급 기능으로 제공한다 — 즉, **하네스 코
 | 상위 하네스 패턴 | GHCP에서의 대응 수단 |
 | --- | --- |
 | Plan/Act·페르소나 모드 | `*.agent.md` 커스텀 에이전트(도구 제한 포함) |
-| 규칙·스킬·메모리 | `copilot-instructions.md`, `*.instructions.md`(applyTo), `SKILL.md`, 메모리 스코프 |
-| ACI / 모델용 도구 | 내장 `read_file`/`grep_search`/`file_search`/`semantic_search`/편집/터미널 도구 |
-| Repo Map | `semantic_search` + `grep_search` 조합으로 근사 |
-| 서브에이전트 | `runSubagent` (예: Explore 에이전트) |
+| 규칙·스킬·메모리 | `copilot-instructions.md`(또는 `AGENTS.md`, 택1), `*.instructions.md`(applyTo), `SKILL.md` |
+| ACI / 모델용 도구 | 내장 tool alias `read`/`search`/`edit`/`execute`/`web`/`todo` |
+| Repo Map | `search` alias(코드베이스 의미 검색 + 텍스트 검색) 조합으로 근사 |
+| 서브에이전트 | `agent` alias + `agents` allowlist (예: Explore) |
 | 체크포인트/Undo | VS Code 변경 추적 + Git |
-| 승인 게이트·샌드박스 | 도구 승인 UX + 위험 작업 확인 정책 |
-| 린트/테스트 루프 | `get_errors` + `run_in_terminal` |
-| 라우팅·모델 선택 (claude-code-router) | 모델 피커 + 에이전트별 권장 모델 지정(가볍/사고/대컨텍스트) |
-| 평가(eval) 검증 (SWE-bench) | `run_in_terminal`로 테스트·빌드 실행 + diff 검토(패치+테스트 통과를 완료 기준으로) |
+| 승인 게이트·샌드박스 | 도구 승인 UX + 위험 작업 확인 정책 + hooks(PreToolUse) |
+| 린트/테스트 루프 | 진단(`get_errors` 상당) + `execute`(터미널) |
+| 라우팅·모델 선택 (claude-code-router) | 모델 피커 + 에이전트별 권장 모델(`model:` frontmatter) |
+| 평가(eval) 검증 (SWE-bench) | `execute`로 테스트·빌드 실행 + diff 검토(패치+테스트 통과를 완료 기준으로) |
 | CI 하네스 (claude-code-action) | (향후) GitHub Actions에서 Copilot coding agent / 구조화 출력 |
+
+> 도구 표기 주의: 위는 **실제 VS Code/Copilot tool alias**(`read`·`search`·`edit`·`execute`·`web`·`agent`·`todo`)다. `.agent.md`의 `tools:` 필드에 그대로 쓴다. 정확한 확장/MCP 도구 id는 Chat Diagnostics나 Agent Customizations 에디터에서 확인 후 고정한다.
 
 ➡️ 상세 설계는 [02-ghcp-harness-design.md](02-ghcp-harness-design.md) 참고.
 

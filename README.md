@@ -32,10 +32,10 @@ GitHub Copilot(GHCP)에서 잘 작동하는 **AI 코딩 에이전트 하네스**
 
 ## 설계 핵심
 
-- **3 모드**: Plan(읽기 전용 탐색) · Build(편집+검증) · Ask(Q&A) — `*.agent.md` 도구 제한으로 강제
-- **Explore 서브에이전트**: 광범위 탐색을 격리해 메인 컨텍스트 보호
-- **검증 루프**: 편집 → `get_errors` → 테스트 → 자기 수정
-- **메모리 표준**: `AGENTS.md` + `*.instructions.md` + `SKILL.md`
+- **3 모드**: Plan(읽기 전용 탐색) · Build(편집+검증) · Ask(Q&A) — `*.agent.md`의 `tools` 허용 목록으로 강제
+- **Explore 서브에이전트**: 광범위 탐색을 격리해 메인 컨텍스트 보호(읽기 전용, `agents` allowlist)
+- **검증 루프**: 기준선 → 편집 → 진단 → 테스트 → 자기수정(신규 실패만, 최대 2회) → 에스컬레이트
+- **메모리 표준**: 항상 로딩 파일은 **단 하나**(`copilot-instructions.md` 또는 `AGENTS.md` — 둘 다 쓰지 않음) + 경로별 `*.instructions.md` + 온디맨드 `SKILL.md`
 
 ## 조합 설계 핵심 (시너지/상충)
 
@@ -43,6 +43,21 @@ GitHub Copilot(GHCP)에서 잘 작동하는 **AI 코딩 에이전트 하네스**
 - **다이얼은 전역 고정 금지** — 모드·위험·크기로 조절. 충돌 시 우선순위: 연속성 > 통제·검증 > 속도 > 자율
 - **확정 결론**: 코드 작성은 단일 스레드, 서브에이전트는 read-only 전용, 모델 라우팅은 작업 경계에서만 (Cognition·Anthropic 근거)
 
+## 구현 파일 (`.github/`)
+
+설계를 VS Code/Copilot 커스터마이제이션 파일로 구현한 결과물. 모든 파일은 표준 인식 경로인 `.github/` 아래에 있다.
+
+| 파일 | 역할 |
+| --- | --- |
+| [.github/copilot-instructions.md](.github/copilot-instructions.md) | 단일 always-on 전역 규칙(불변용 최소 규칙) |
+| [.github/agents/plan.agent.md](.github/agents/plan.agent.md) | Plan — 읽기 전용 탐색·계획(`[read, search, web, agent]`) |
+| [.github/agents/build.agent.md](.github/agents/build.agent.md) | Build — 구현+검증(`[read, search, edit, execute, todo, agent]`) |
+| [.github/agents/ask.agent.md](.github/agents/ask.agent.md) | Ask — 읽기 전용 Q&A(`[read, search, web]`) |
+| [.github/agents/explore.agent.md](.github/agents/explore.agent.md) | Explore — 서브에이전트(`[read, search]`, user-invocable:false) |
+| [.github/instructions/](.github/instructions/) | 경로별 규칙(typescript·tests·docs, `applyTo`) |
+| [.github/skills/](.github/skills/) | 온디맨드 절차(test-debugging·release-checklist) |
+| [examples/scenarios.md](examples/scenarios.md) | 5개 드라이런 시나리오(버그·기능·리팩터링·테스트·문서) |
+
 ## 상태
 
-조사 → 설계 준비 단계 완료. 다음은 설계서 7장의 구현 로드맵(에이전트 파일 작성)부터 진행.
+조사 → 설계 → 구현 완료. `.github/` 에이전트·규칙·스킬과 드라이런 시나리오까지 구축됨. 향후 확장은 설계서 7장의 CI 하네스(GitHub Actions 연동).
