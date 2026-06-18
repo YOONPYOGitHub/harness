@@ -1,0 +1,49 @@
+{
+  "$comment": "Agent hooks 등록 설정. 설계: docs/02 §3.9. Claude Code .claude/settings.json hooks 포맷과 호환. 명령은 워크스페이스 루트(cwd) 기준 상대 경로의 node 스크립트.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .github/hooks/session-ready.mjs" }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .github/hooks/session-ready.mjs" }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|create_file|replace_string_in_file|multi_replace_string_in_file|insert_edit_into_file|apply_patch|str_replace",
+        "hooks": [
+          { "type": "command", "command": "node .github/hooks/protect-paths.mjs" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|create_file|replace_string_in_file|multi_replace_string_in_file|insert_edit_into_file|apply_patch|str_replace",
+        "hooks": [
+          { "type": "command", "command": "node .github/hooks/validate-docs.mjs" }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .github/hooks/precompact-handoff.mjs" }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .github/hooks/verify-done.mjs" }
+        ]
+      }
+    ]
+  }
+}

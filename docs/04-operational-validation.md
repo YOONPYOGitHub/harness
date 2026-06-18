@@ -67,4 +67,20 @@ Plan 에이전트로 계획을 완료한 뒤 응답 하단의 handoff 버튼을 
 | 18 | VS Code Diagnostics 메시지 | 원문 그대로 |
 | 19 | 수정 여부와 이유 | 수정함/보류함 + 근거 |
 
-> 이 체크리스트는 자동화 대상이 아니다. 향후 일부 항목을 실행형으로 옮긴다면 [02-ghcp-harness-design.md](02-ghcp-harness-design.md) §7 로드맵의 CI 하네스 단계에서 다룬다. 현재는 수동 검증만 수행한다.
+## G. 기계적 강제 — Hooks·상태·거버넌스 (일부 실행형)
+
+[.github/hooks/](../.github/hooks/)·[feature_list.json](../feature_list.json)·[scripts/harness-doctor.mjs](../scripts/harness-doctor.mjs)는 설계서 [02 §3.9–3.11](02-ghcp-harness-design.md)의 구현이다. 아래 중 **G-1·G-2·G-3은 `node`로 직접 실행 가능**하며(빌드 러너 불필요), 나머지는 VS Code에서 수동 확인한다.
+
+| # | 확인 항목 | 기대 결과 | 방법 | 결과 | 비고 |
+| --- | --- | --- | --- | --- | --- |
+| 20 | `node scripts/harness-doctor.mjs` 통과 | 종료 코드 0, "OK" 출력 | 터미널 실행 |  |  |
+| 21 | `feature_list.json` 파싱 가능 | `node -e` 로 `JSON.parse` 성공 | 터미널 실행 |  |  |
+| 22 | hook 설정 JSON 유효 | `.github/hooks/hooks.json` 파싱 성공 | 터미널 실행 |  |  |
+| 23 | `chat.useCustomAgentHooks` / hooks Preview 활성화 | hook이 Diagnostics에 로드 | VS Code 설정·Diagnostics |  |  |
+| 24 | PreToolUse 보호 경로 차단 | 보호 파일(`copilot-instructions.md`·`feature_list.json`·`docs/05` 채택 항목) 직접 편집 시 차단 | Build로 일부러 편집 시도 |  |  |
+| 25 | Stop 검증 게이트 | 미커밋 `status` 변경 있을 때 종료 차단, 커밋 후 통과 | feature_list 변경 후 Stop |  |  |
+| 26 | `/finish` 프롬프트 동작 | 검증→상태 갱신→handoff→커밋 순서 안내 | [.github/prompts/finish.prompt.md](../.github/prompts/finish.prompt.md) 호출 |  |  |
+
+> G-4(항목 24·25)는 hooks Preview 기능 활성화가 전제다. 비활성 환경에서는 hook 파일이 **문서·정책**으로만 작동하고 기계적 차단은 일어나지 않는다 — 이 경우 [02 §3.9](02-ghcp-harness-design.md)의 선언적 규칙으로 폴백한다.
+
+> 이 체크리스트의 A~F는 자동화 대상이 아니다. G의 실행형 항목(20~22)은 harness-doctor를 통해 CI로 승격할 수 있으며, 이는 [02-ghcp-harness-design.md](02-ghcp-harness-design.md) §7 로드맵 9번(CI 하네스)에서 다룬다.

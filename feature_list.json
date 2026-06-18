@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": 1,
+  "description": "하네스 컴포넌트 레지스트리(정규 상태 소스). 설계: docs/02 §3.10. status 변경은 /finish(.github/prompts/finish.prompt.md) 단일 경로로만.",
+  "statuses": ["not-started", "in-progress", "done", "deferred"],
+  "features": [
+    {
+      "id": "global-instructions",
+      "title": "단일 always-on 전역 규칙",
+      "path": ".github/copilot-instructions.md",
+      "status": "done",
+      "priority": "P0",
+      "deps": [],
+      "acceptance": "불변 6규칙·검증 정의·도구·소통 포함, 항상 로드되는 유일 파일"
+    },
+    {
+      "id": "agent-plan",
+      "title": "Plan 에이전트(읽기 전용 탐색·계획)",
+      "path": ".github/agents/plan.agent.md",
+      "status": "done",
+      "priority": "P0",
+      "deps": ["global-instructions"],
+      "acceptance": "tools에 edit·execute 없음, 산출물은 단계별 계획"
+    },
+    {
+      "id": "agent-build",
+      "title": "Build 에이전트(구현+검증)",
+      "path": ".github/agents/build.agent.md",
+      "status": "done",
+      "priority": "P0",
+      "deps": ["global-instructions"],
+      "acceptance": "tools에 edit·execute 포함, 검증 루프 수행, Explore 위임"
+    },
+    {
+      "id": "agent-ask",
+      "title": "Ask 에이전트(읽기 전용 Q&A)",
+      "path": ".github/agents/ask.agent.md",
+      "status": "done",
+      "priority": "P1",
+      "deps": ["global-instructions"],
+      "acceptance": "tools에 edit·execute 없음"
+    },
+    {
+      "id": "agent-explore",
+      "title": "Explore 서브에이전트(read-only)",
+      "path": ".github/agents/explore.agent.md",
+      "status": "done",
+      "priority": "P1",
+      "deps": ["global-instructions"],
+      "acceptance": "tools=[read,search], user-invocable:false, 쓰기 위임 불가"
+    },
+    {
+      "id": "instr-typescript",
+      "title": "TypeScript 경로별 규칙",
+      "path": ".github/instructions/typescript.instructions.md",
+      "status": "done",
+      "priority": "P2",
+      "deps": [],
+      "acceptance": "applyTo 패턴으로 ts/js 파일에 한정 적용"
+    },
+    {
+      "id": "instr-tests",
+      "title": "테스트 경로별 규칙",
+      "path": ".github/instructions/tests.instructions.md",
+      "status": "done",
+      "priority": "P2",
+      "deps": [],
+      "acceptance": "applyTo 패턴으로 test/spec 파일에 한정 적용"
+    },
+    {
+      "id": "instr-docs",
+      "title": "문서 경로별 규칙",
+      "path": ".github/instructions/docs.instructions.md",
+      "status": "done",
+      "priority": "P2",
+      "deps": [],
+      "acceptance": "applyTo=**/*.md, 파일 링크·표·코드펜스 포맷 규칙"
+    },
+    {
+      "id": "skill-test-debugging",
+      "title": "테스트 디버깅 스킬",
+      "path": ".github/skills/test-debugging/SKILL.md",
+      "status": "done",
+      "priority": "P2",
+      "deps": [],
+      "acceptance": "온디맨드 로드, 기준선·신규/기존 실패 구분 절차"
+    },
+    {
+      "id": "skill-release-checklist",
+      "title": "릴리스 체크리스트 스킬",
+      "path": ".github/skills/release-checklist/SKILL.md",
+      "status": "done",
+      "priority": "P2",
+      "deps": [],
+      "acceptance": "온디맨드 로드, 비가역 작업 승인 게이트 포함"
+    },
+    {
+      "id": "skill-repo-map",
+      "title": "리포 맵 스킬",
+      "path": ".github/skills/repo-map/SKILL.md",
+      "status": "done",
+      "priority": "P2",
+      "deps": [],
+      "acceptance": "온디맨드 로드, 대형 작업 전 구조 요약"
+    },
+    {
+      "id": "hooks-config",
+      "title": "Agent hooks 등록 설정",
+      "path": ".github/hooks/hooks.json",
+      "status": "done",
+      "priority": "P1",
+      "deps": ["global-instructions"],
+      "acceptance": "Claude settings 호환 포맷, 6개 hook 스크립트 등록, node -e JSON.parse 성공"
+    },
+    {
+      "id": "hooks-protect-paths",
+      "title": "PreToolUse 보호 경로 가드",
+      "path": ".github/hooks/protect-paths.mjs",
+      "status": "done",
+      "priority": "P1",
+      "deps": ["hooks-config"],
+      "acceptance": "보호 경로 직접 편집 시 permissionDecision=ask/deny, stdin JSON 파싱"
+    },
+    {
+      "id": "hooks-validate-docs",
+      "title": "PostToolUse 문서 포맷 검사",
+      "path": ".github/hooks/validate-docs.mjs",
+      "status": "done",
+      "priority": "P2",
+      "deps": ["hooks-config"],
+      "acceptance": "마크다운 깨진 상대 링크 비차단 경고(over-firing 회피)"
+    },
+    {
+      "id": "hooks-verify-done",
+      "title": "Stop 검증 게이트",
+      "path": ".github/hooks/verify-done.mjs",
+      "status": "done",
+      "priority": "P1",
+      "deps": ["hooks-config"],
+      "acceptance": "feature_list.json 미커밋 시 decision=block, stop_hook_active로 무한 루프 방지"
+    },
+    {
+      "id": "hooks-session-ready",
+      "title": "SessionStart·UserPromptSubmit 컨텍스트 주입",
+      "path": ".github/hooks/session-ready.mjs",
+      "status": "done",
+      "priority": "P2",
+      "deps": ["hooks-config"],
+      "acceptance": "feature_list 진행 항목 요약을 additionalContext로 주입"
+    },
+    {
+      "id": "hooks-precompact-handoff",
+      "title": "PreCompact handoff 덤프",
+      "path": ".github/hooks/precompact-handoff.mjs",
+      "status": "done",
+      "priority": "P2",
+      "deps": ["hooks-config"],
+      "acceptance": "load-bearing 컨텍스트 보존 안내를 additionalContext로 주입"
+    },
+    {
+      "id": "prompt-finish",
+      "title": "/finish 완료 단일 경로",
+      "path": ".github/prompts/finish.prompt.md",
+      "status": "done",
+      "priority": "P1",
+      "deps": ["hooks-verify-done"],
+      "acceptance": "검증→feature_list 갱신→handoff→커밋 순서를 강제하는 단일 상태 변경 경로"
+    },
+    {
+      "id": "script-harness-doctor",
+      "title": "거버넌스 검사 harness-doctor",
+      "path": "scripts/harness-doctor.mjs",
+      "status": "done",
+      "priority": "P1",
+      "deps": ["hooks-config", "prompt-finish"],
+      "acceptance": "node 실행 시 보호경로 정합·문서 수치 정합·죽은 자산 검사, 통과 시 exit 0"
+    },
+    {
+      "id": "scenarios",
+      "title": "드라이런 시나리오",
+      "path": "examples/scenarios.md",
+      "status": "done",
+      "priority": "P2",
+      "deps": [],
+      "acceptance": "버그·기능·리팩터링·테스트·문서 5개 시나리오"
+    }
+  ]
+}

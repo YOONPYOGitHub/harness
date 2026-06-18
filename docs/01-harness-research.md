@@ -181,10 +181,13 @@ GHCP는 이미 다음을 1급 기능으로 제공한다 — 즉, **하네스 코
 | 서브에이전트 | `agent` alias + `agents` allowlist (예: Explore) |
 | 체크포인트/Undo | VS Code 변경 추적 + Git |
 | 승인 게이트·샌드박스 | 도구 승인 UX + 위험 작업 확인 정책 + hooks(PreToolUse) |
+| 기계적 강제 (OpenAI mechanical enforcement) | **Agent hooks**(`.github/hooks/*.json`): PreToolUse 차단·PostToolUse 검사·Stop 검증 게이트. Claude `.claude/settings.json` 포맷과 호환 → 직접 마이그레이션 |
 | 린트/테스트 루프 | 진단(`get_errors` 상당) + `execute`(터미널) |
 | 라우팅·모델 선택 (claude-code-router) | 모델 피커 + 에이전트별 권장 모델(`model:` frontmatter) |
 | 평가(eval) 검증 (SWE-bench) | `execute`로 테스트·빌드 실행 + diff 검토(패치+테스트 통과를 완료 기준으로) |
 | CI 하네스 (claude-code-action) | (향후) GitHub Actions에서 Copilot coding agent / 구조화 출력 |
+
+> **Claude Code 하네스 마이그레이션**: VS Code Copilot은 Agent hooks를 Claude와 **같은 8개 이벤트**(SessionStart·UserPromptSubmit·PreToolUse·PostToolUse·PreCompact·SubagentStart·SubagentStop·Stop)으로 제공하고, `.claude/agents`·`.claude/rules`·`.claude/settings.json`·`.claude/skills`·`CLAUDE.md`를 자동 인식한다. 따라서 wikidocs([365038](https://wikidocs.net/365038))의 STEP 5 hooks·feature_list.json·`/finish` 패턴을 GHCP로 **거의 그대로 이식**할 수 있다(설계: [02 §3.9–3.11](02-ghcp-harness-design.md)).
 
 > 도구 표기 주의: 위는 **실제 VS Code/Copilot tool alias**(`read`·`search`·`edit`·`execute`·`web`·`agent`·`todo`)다. `.agent.md`의 `tools:` 필드에 그대로 쓴다. 정확한 확장/MCP 도구 id는 Chat Diagnostics나 Agent Customizations 에디터에서 확인 후 고정한다.
 

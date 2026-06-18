@@ -11,6 +11,8 @@ GitHub Copilot(GHCP)에서 잘 작동하는 **AI 코딩 에이전트 하네스**
 | [docs/03-synergy-conflict-design.md](docs/03-synergy-conflict-design.md) | 아이디어 **조합**의 시너지/상충 분석 — 6개 텐션 축, 상충 매트릭스, 코딩에 멀티에이전트·중간 모델전환 비채택 결론, 다이얼 기본 구성 |
 | [docs/04-operational-validation.md](docs/04-operational-validation.md) | 실제 VS Code/Copilot에서 에이전트·지침·스킬이 로드·동작하는지 확인하는 수동 운영 검증 체크리스트 |
 | [docs/05-decision-log.md](docs/05-decision-log.md) | 외부 피드백의 채택·기각·보류 결정 로그(근거 포함) |
+| [docs/06-harness-operating-plan.md](docs/06-harness-operating-plan.md) | 하네스를 **잘 작동시키는** 운영·진화 규율 — 스티어링 루프, 컴포넌트 ablation, 거버넌스 게이트, 의도적 보류와 도입 트리거 |
+| [docs/harness-changelog.md](docs/harness-changelog.md) | 하네스 변경 이력 — 관찰된 실패와 그에 대한 최소 조임을 함께 기록(원칙 4) |
 
 ## 한눈에 보기 (Star 검증값, 2026-06-11)
 
@@ -58,6 +60,10 @@ GitHub Copilot(GHCP)에서 잘 작동하는 **AI 코딩 에이전트 하네스**
 | [.github/agents/explore.agent.md](.github/agents/explore.agent.md) | Explore — 서브에이전트(`[read, search]`, user-invocable:false) |
 | [.github/instructions/](.github/instructions/) | 경로별 규칙(typescript·tests·docs, `applyTo`) |
 | [.github/skills/](.github/skills/) | 온디맨드 절차(test-debugging·release-checklist·repo-map) |
+| [.github/hooks/](.github/hooks/) | **기계적 강제**(Agent hooks) — PreToolUse 보호경로 차단·PostToolUse 포맷 검사·Stop 검증 게이트 |
+| [.github/prompts/finish.prompt.md](.github/prompts/finish.prompt.md) | `/finish` — 검증→상태 갱신→handoff→커밋 단일 완료 경로 |
+| [feature_list.json](feature_list.json) | 하네스 자산 상태의 단일 정본(canonical state) |
+| [scripts/harness-doctor.mjs](scripts/harness-doctor.mjs) | 거버넌스 검사 — 문서↔훅 보호경로·문서 번호·사장 자산 정합 (`node`로 실행) |
 | [examples/scenarios.md](examples/scenarios.md) | 5개 드라이런 시나리오(버그·기능·리팩터링·테스트·문서) |
 
 ## Scope and non-goals
@@ -71,9 +77,10 @@ GitHub Copilot(GHCP)에서 잘 작동하는 **AI 코딩 에이전트 하네스**
 **현재 보장하지 않는 것 (non-goals)**
 
 - 이 저장소는 **자체 에이전트 런타임이 아니다.** SWE-agent/OpenHands처럼 sandbox·event-loop·ACI를 직접 구현하지 않는다.
-- GitHub Copilot **cloud agent는 future target**이며, `handoffs`·`web`·`todo` 동작 차이가 있으므로 별도 검증 전에는 동일 동작을 보장하지 않는다(상세: [docs/02 §3.1](docs/02-ghcp-harness-design.md)).
-- CI hooks, repo-map generator, sandbox guardrail은 **future roadmap**이다(근거: [docs/05-decision-log.md](docs/05-decision-log.md) 보류 항목).
+- GitHub Copilot **cloud agent는 future target**이며, `handoffs`·`web`·`todo`·hooks 동작 차이가 있으므로 별도 검증 전에는 동일 동작을 보장하지 않는다(상세: [docs/02 §3.1](docs/02-ghcp-harness-design.md)).
+- 기계적 강제는 **로컬 Agent hooks Preview**에 의존한다. 기능 비활성 환경에서는 hook이 선언적 정책으로만 작동하고 자동 차단은 일어나지 않는다.
+- **CI 하네스**(GitHub Actions 연동·원격 강제)와 sandbox guardrail은 **future roadmap**이다(근거: [docs/05-decision-log.md](docs/05-decision-log.md) 보류 항목).
 
 ## 상태
 
-조사 → 설계 → 구현 완료. `.github/` 에이전트·규칙·스킬과 드라이런 시나리오까지 구축됨. 향후 확장은 설계서 7장의 CI 하네스(GitHub Actions 연동).
+조사 → 설계 → 구현 완료. `.github/` 에이전트·규칙·스킬·**hooks**, [feature_list.json](feature_list.json), [scripts/harness-doctor.mjs](scripts/harness-doctor.mjs), 드라이런 시나리오까지 구축됨. 기계적 강제는 로컬 Agent hooks(Preview)로 동작하며, 향후 확장은 설계서 7장의 CI 하네스(GitHub Actions 연동).
