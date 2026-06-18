@@ -1,0 +1,17 @@
+{
+  "name": "expense-cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "하네스 dogfood 검증용 가계부 CLI (TypeScript + vitest)",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cli": "node --import tsx src/cli.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

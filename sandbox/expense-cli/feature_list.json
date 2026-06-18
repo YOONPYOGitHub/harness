@@ -1,0 +1,12 @@
+{
+  "app": "expense-cli",
+  "note": "이 파일은 앱 단위 기능 레지스트리이며, 레포 정규 상태(루트 feature_list.json)와 무관하다. protect-paths는 루트만 보호한다(F3 수정 반영).",
+  "features": [
+    { "id": "exp-1", "title": "수입/지출 항목 추가(add)", "status": "done" },
+    { "id": "exp-2", "title": "항목 목록(list, type 필터)", "status": "done" },
+    { "id": "exp-3", "title": "카테고리별 합계(summary)", "status": "done" },
+    { "id": "exp-4", "title": "잔액 계산(balance)", "status": "done" },
+    { "id": "exp-5", "title": "항목 삭제(rm)", "status": "done" },
+    { "id": "exp-6", "title": "JSON 영속화(persist) + 직렬화 라운드트립", "status": "done" }
+  ]
+}
