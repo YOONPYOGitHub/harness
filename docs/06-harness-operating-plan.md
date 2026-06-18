@@ -13,17 +13,17 @@
 ```
 실제 작업으로 하네스를 돌린다(dogfood)
    → 마찰/실패를 관찰한다
-   → harness-changelog.md 에 기록한다 (관찰 사실 + 빈도)
+   → 결정 로그([05](05-decision-log.md))에 관찰 사실과 빈도를 남긴다
    → 반복되면, 그 실패에만 맞춰 최소한으로 조인다 (hook/규칙/스크립트)
    → 추가한 장치는 다음 ablation 대상이 된다
 ```
 
 - 단일 관찰은 기록만 한다. **반복**될 때 비로소 기계화한다(과설계 방지).
-- 모든 하네스 변경은 [harness-changelog.md](harness-changelog.md)에 근거(관찰)와 함께 남긴다(원칙 4).
+- 모든 하네스 변경은 [결정 로그](05-decision-log.md)에 근거(관찰)와 함께 남긴다(원칙 4).
 
 ## 3. 컴포넌트 ablation — 현재 6 hook이 자기 자리를 버는가
 
-2026-06-18 실측(stdin 주입으로 결정 출력 확인). 판정 기준: "이 컴포넌트가 막으려는 실패가 실재하고, 실제로 막는가."
+stdin 주입으로 각 hook의 결정 출력을 확인한다. 판정 기준: "이 컴포넌트가 막으려는 실패가 실재하고, 실제로 막는가."
 
 | 컴포넌트 | 인코딩한 가정 | 실측 | 판정 |
 | --- | --- | --- | --- |
@@ -32,15 +32,15 @@
 | [protect-paths]·[hooks.json](../.github/hooks/hooks.json) 배선 | 규칙은 선언만으론 안 지켜진다 | harness-doctor가 배선 확인 | **유지** |
 | [session-ready](../.github/hooks/session-ready.mjs) (SessionStart/Prompt) | 세션 시작 시 상태를 잊는다 | 요약 주입 동작 | **유지(한계)** — deps 충족 다음후보 자동계산은 미구현 |
 | [precompact-handoff](../.github/hooks/precompact-handoff.mjs) (PreCompact) | 압축이 load-bearing 컨텍스트를 날린다 | 안내 주입 동작 | **유지(한계)** — 휘발성, 영속 산출물 없음 |
-| [validate-docs](../.github/hooks/validate-docs.mjs) (PostToolUse) | 깨진 링크가 새어나간다 | broken 감지·clean 통과 | **유지(주변)** — 가치 낮음, 과발화 1회 깎아냄 |
+| [validate-docs](../.github/hooks/validate-docs.mjs) (PostToolUse) | 깨진 링크가 새어나간다 | broken 감지·clean 통과 | **유지(주변)** — 가치 낮음, 깨진 링크만 검사(저신호 휴리스틱 배제) |
 
 > 판정: 현재는 6개 모두 자리를 번다. 단 아래 셋은 **주변/한계**이며, 모델 발전이나 무용 관찰 시 **제거 1순위**다 — validate-docs, session-ready의 미사용 부분, precompact의 휘발성.
 
-## 4. 거버넌스 게이트 — 검증을 기계화 (관찰 근거 있음)
+## 4. 거버넌스 게이트 — 검증을 기계화
 
-**관찰된 실패(2026-06-18)**: 설계서가 보호 경로 하나를 누락한 드리프트를 [harness-doctor](../scripts/harness-doctor.mjs)가 잡았다. 단, 이는 사람이 **수동으로** 돌렸기에 잡힌 것이다. 수동에 의존하면 다음엔 새어나간다. → 로컬 CI 등가물로 **Stop 게이트에 harness-doctor를 결합**해, 하네스 자산이 바뀐 채 드리프트가 있으면 종료를 막는다(원칙 6). 자기해소: 드리프트를 고치면 통과한다.
+문서가 주장하는 보호 경로와 hook이 실제 차단하는 경로가 어긋나는 거버넌스 드리프트는 [harness-doctor](../scripts/harness-doctor.mjs)가 검출한다. 단 수동 실행에만 의존하면 드리프트가 새어나가므로, 로컬 CI 등가물로 **Stop 게이트(verify-done)에 harness-doctor를 결합**해 하네스 자산이 바뀐 채 드리프트가 있으면 종료를 막는다(원칙 6). 자기해소: 드리프트를 고치면 통과한다.
 
-이는 §3의 ablation 규율과 충돌하지 않는다 — **한 번 관찰된, 재발 위험이 분명한** 실패에 대한 최소 조임이기 때문이다.
+이는 §3의 ablation 규율과 충돌하지 않는다 — 재발 위험이 분명한 실패에 대한 최소한의 조임이기 때문이다.
 
 ## 5. 의도적 보류와 도입 트리거
 
@@ -59,12 +59,3 @@
 ## 6. self-eval 회피 (재확인)
 
 완료 판정은 LLM 자기확신이 아니라 **실제 명령 출력**(테스트 로그·링크검사·harness-doctor 출력)을 인용해서만 내린다. Stop 게이트도 같은 모델이 답하므로, 게이트의 통과 근거는 항상 인용 가능한 출력이어야 한다([02 §3.9](02-ghcp-harness-design.md) 규칙 4).
-
-## 7. 이 계획의 실행 범위 (이번 작업)
-
-관찰 근거가 있는 저비용 항목만 실행하고, 나머지는 §5로 보류한다.
-
-1. 이 문서(docs/06) — 운영 규율의 단일 소스.
-2. [harness-changelog.md](harness-changelog.md) 신설 — 실제 관찰 2건(드리프트 포착, validate-docs 과발화 수정)으로 시드.
-3. [verify-done](../.github/hooks/verify-done.mjs)에 harness-doctor 게이트 결합(§4).
-4. 문서↔구현 정합 갱신([02](02-ghcp-harness-design.md)·[README](../README.md)·[feature_list.json](../feature_list.json)) 후 harness-doctor green 확인.

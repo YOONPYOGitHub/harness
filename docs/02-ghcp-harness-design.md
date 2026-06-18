@@ -221,7 +221,7 @@ claude-code-router처럼 **작업 성격에 따라 모델을 고르는 것**도 
 2. **문서 수치 ↔ 실제** 일치(예: "에이전트 4개" ↔ `.github/agents/` 실제 파일 수, `feature_list.json` 항목 수).
 3. **등록된 자산이 어딘가에서 참조·배선**되는가(죽은 스킬·도구 탐지).
 
-> harness-doctor는 docs 레포에서도 `node`로 실행·검증 가능하므로(빌드 러너 불필요), [04-operational-validation.md](04-operational-validation.md)의 수동 체크리스트를 **부분적으로 실행형**으로 끌어올린다. 또한 [Stop hook(verify-done)](../.github/hooks/verify-done.mjs)이 하네스 자산 변경 시 harness-doctor를 자동 실행해 드리프트를 **수동 실행 의존에서 기계 게이트로** 승격한다(관찰 근거: [harness-changelog](harness-changelog.md) 2026-06-18, 운영 규율: [06 §4](06-harness-operating-plan.md)).
+> harness-doctor는 docs 레포에서도 `node`로 실행·검증 가능하므로(빌드 러너 불필요), [04-operational-validation.md](04-operational-validation.md)의 수동 체크리스트를 **부분적으로 실행형**으로 끕어올린다. 또한 [Stop hook(verify-done)](../.github/hooks/verify-done.mjs)이 하네스 자산 변경 시 harness-doctor를 자동 실행해 드리프트를 기계 게이트로 막는다(운영 규율: [06 §4](06-harness-operating-plan.md)).
 
 ## 4. 시스템 프롬프트 골격 (모드별 공통 + 차등)
 
