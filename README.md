@@ -1,6 +1,26 @@
 # GHCP Harness
 
-GitHub Copilot(GHCP)에서 잘 작동하는 **AI 코딩 에이전트 하네스**를 설계하기 위한 리서치 & 설계 저장소.
+GitHub Copilot(GHCP)에서 잘 작동하는 **AI 코딩 에이전트 하네스**. VS Code Copilot의 커스텀 에이전트·instructions·skills·Agent hooks를 조합해 **계획→구현→검증→완료**를 규율(governance)로 강제하는 정책 레이어다. 모델 런타임을 새로 만들지 않고 `.github/` 자산만으로 동작한다.
+
+## Quick Start (clone & use)
+
+이 하네스는 별도 설치형 프로그램이 아니라 `.github/` 커스터마이제이션으로 동작한다. 새 프로젝트에 적용하는 가장 빠른 길:
+
+```bash
+# 1) 이 저장소를 받는다
+git clone https://github.com/YOONPYOGitHub/harness.git
+cd harness
+
+# 2) 거버넌스·hook 로직이 정상인지 확인(빌드 러너 불필요, Node 18+)
+node scripts/harness-doctor.mjs   # 기대: "OK — harness-doctor 통과"
+node --test tests/                # 기대: hook 단위 테스트 통과
+```
+
+**기존 프로젝트에 하네스만 얹으려면** `.github/`(agents·instructions·skills·hooks·prompts·copilot-instructions.md)와 `scripts/harness-doctor.mjs`, `feature_list.json`을 대상 저장소 루트로 복사한 뒤, VS Code에서 그 저장소를 **워크스페이스 루트로 열면** 에이전트·규칙·hooks가 자동 인식된다. 조작법은 [docs/HOWTO-run-harness.md](docs/HOWTO-run-harness.md) 참고.
+
+> 전제: VS Code + GitHub Copilot Chat. 기계적 강제(hooks)는 로컬 Agent hooks(Preview) 활성 시 작동하며, 비활성 환경에서는 선언적 정책으로 폴백한다. CI(`.github/workflows/harness-ci.yml`)는 push·PR마다 거버넌스 검사를 원격에서 강제한다.
+
+라이선스: [MIT](LICENSE). 변경 이력·복구 앵커는 [CHANGELOG.md](CHANGELOG.md).
 
 ## 문서
 
