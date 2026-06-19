@@ -203,7 +203,7 @@ claude-code-router처럼 **작업 성격에 따라 모델을 고르는 것**도 
 3. **감지 ≠ 자동 실행**: 부수효과가 크고 되돌리기 어려운 작업(재빌드, 배포)은 hook이 **알림만** 주고 실행은 사람 확인을 받는다(C1·wikidocs 보강 ⑤).
 4. **self-eval 회피**: Stop hook의 점검 질문도 같은 LLM이 답한다. "실제 명령 출력(테스트 로그·링크검사 결과)을 인용해서만 통과"를 명시한다.
 
-> 이 저장소는 빌드·테스트 러너가 없는 **문서·설계 레포**다. 따라서 hook의 대상은 *애플리케이션 코드*가 아니라 **하네스 자산 자신**이다. 현재 PreToolUse 가드가 보호하는 경로는 세 개다: [feature_list.json](../feature_list.json)(정규 상태 소스, `deny` — `/finish`로만 변경)·[.github/copilot-instructions.md](../.github/copilot-instructions.md)(단일 always-on 규칙, `ask`)·[docs/05-decision-log.md](05-decision-log.md)(불변 채택 결정, `ask`). 마크다운 변경 시 링크·표 포맷을 검증한다. 구현은 [.github/hooks/](../.github/hooks/), 거버넌스 검사는 [scripts/harness-doctor.mjs](../scripts/harness-doctor.mjs)에 있다(보호 경로 상수를 import 해 문서↔hook 정합을 검사).
+> 이 저장소는 빌드·테스트 러너가 없는 **문서·설계 레포**다. 따라서 hook의 대상은 *애플리케이션 코드*가 아니라 **하네스 자산 자신**이다. 현재 PreToolUse 가드가 보호하는 경로는 정확 일치 셋과 prefix 하나다: [feature_list.json](../feature_list.json)(정규 상태 소스, `deny` — `/finish`로만 변경)·[.github/copilot-instructions.md](../.github/copilot-instructions.md)(단일 always-on 규칙, `ask`)·[docs/05-decision-log.md](05-decision-log.md)(불변 채택 결정, `ask`), 그리고 [.github/hooks/](../.github/hooks/) 디렉터리 전체(기계적 강제 구현, `ask` — prefix 매칭, 가드를 바꾸면 강제력이 약해지므로 승인 필요). 마크다운 변경 시 링크·표 포맷을 검증한다. 구현은 [.github/hooks/](../.github/hooks/), 거버넌스 검사는 [scripts/harness-doctor.mjs](../scripts/harness-doctor.mjs)에 있다(보호 경로 상수를 import 해 문서↔hook 정합을 검사).
 
 ### 3.10 상태 파일 + 단일 변경 경로 (wikidocs STEP 3·7)
 
@@ -221,7 +221,7 @@ claude-code-router처럼 **작업 성격에 따라 모델을 고르는 것**도 
 2. **문서 수치 ↔ 실제** 일치(예: "에이전트 4개" ↔ `.github/agents/` 실제 파일 수, `feature_list.json` 항목 수).
 3. **등록된 자산이 어딘가에서 참조·배선**되는가(죽은 스킬·도구 탐지).
 
-> harness-doctor는 docs 레포에서도 `node`로 실행·검증 가능하므로(빌드 러너 불필요), [04-operational-validation.md](04-operational-validation.md)의 수동 체크리스트를 **부분적으로 실행형**으로 끕어올린다. 또한 [Stop hook(verify-done)](../.github/hooks/verify-done.mjs)이 하네스 자산 변경 시 harness-doctor를 자동 실행해 드리프트를 기계 게이트로 막는다(운영 규율: [06 §4](06-harness-operating-plan.md)).
+> harness-doctor는 docs 레포에서도 `node`로 실행·검증 가능하므로(빌드 러너 불필요), [04-operational-validation.md](04-operational-validation.md)의 수동 체크리스트를 **부분적으로 실행형**으로 끕어올린다. 또한 [Stop hook(verify-done)](../.github/hooks/verify-done.mjs)이 하네스 자산 변경 시 harness-doctor를 자동 실행해 드리프트를 기계 게이트로 막는다(운영 규율: [06 §4](06-harness-operating-plan.md)). 로컬 hook(Preview) 의존을 보완해 [.github/workflows/harness-ci.yml](../.github/workflows/harness-ci.yml)이 push·PR마다 harness-doctor·[hook 단위 테스트](../tests/hooks.test.mjs)·스모크를 원격에서 재현한다(§7 로드맵 9의 1차 구현).
 
 ## 4. 시스템 프롬프트 골격 (모드별 공통 + 차등)
 

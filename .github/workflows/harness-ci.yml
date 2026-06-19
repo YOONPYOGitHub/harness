@@ -1,0 +1,38 @@
+# 하네스 CI — 설계: docs/02 §7 로드맵 9(CI 하네스), docs/05 보류 항목 승격.
+# 로컬 Agent hooks(Preview)에만 의존하던 거버넌스 강제를 push·PR마다 원격에서
+# 기계적으로 재현한다. harness-doctor(거버넌스 정합)·hook 단위 테스트(가드 순수
+# 로직)·스모크(검증 앱 회귀)를 한 잡으로 묶어, hooks 미설정 협업자나 Preview
+# 비활성 환경에서도 드리프트를 차단한다.
+name: harness-ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Governance check (harness-doctor)
+        run: node scripts/harness-doctor.mjs
+
+      - name: Hook unit tests
+        run: node --test tests/
+
+      - name: Install sandbox app deps
+        run: |
+          for d in sandbox/*/; do
+            if [ -f "${d}package.json" ]; then
+              (cd "$d" && npm install --no-audit --no-fund)
+            fi
+          done
+
+      - name: Smoke (sandbox apps)
+        run: node scripts/smoke.mjs

@@ -6,6 +6,10 @@
 //   deny  — 단일 변경 경로(/finish)로만 바꿔야 하는 정규 상태 소스
 //   ask   — 불변/준불변 자산. 사람 승인을 받아야만 편집(C1 위험 등급제)
 //
+// 매칭:
+//   exact (기본) — 레포 루트 기준 정확 경로 일치
+//   prefix         — 디렉터리 하위 전체 보호(가드 구현 자신 같은 자산 군)
+//
 // PROTECTED는 scripts/harness-doctor.mjs가 import 하여
 // "문서가 주장하는 보호 경로 ↔ hook이 실제 차단하는 경로" 정합을 검사한다(§3.11).
 
@@ -17,7 +21,7 @@ import { dirname, resolve, relative, isAbsolute } from "node:path";
 // 하위 프로젝트의 동명 파일(예: sandbox/x/feature_list.json)을 과차단하지 않는다.
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
-/** @typedef {{ path: string, decision: "deny"|"ask", reason: string }} ProtectedRule */
+/** @typedef {{ path: string, decision: "deny"|"ask", reason: string, match?: "exact"|"prefix" }} ProtectedRule */
 
 /** @type {ProtectedRule[]} */
 export const PROTECTED = [
@@ -38,6 +42,13 @@ export const PROTECTED = [
     decision: "ask",
     reason:
       "결정 로그의 채택 항목은 불변입니다. 새 결정은 추가하되 기존 채택 항목 수정은 사람 승인이 필요합니다(C1).",
+  },
+  {
+    path: ".github/hooks/",
+    match: "prefix",
+    decision: "ask",
+    reason:
+      "이 디렉터리는 하네스의 기계적 강제(hooks) 구현입니다. 가드를 변경하면 강제력이 약해지므로 사람 승인이 필요합니다(C1·prefix 보호).",
   },
 ];
 
@@ -62,12 +73,21 @@ export function extractPaths(toolInput = {}) {
   });
 }
 
+/** 한 경로가 규칙에 매치되는가. prefix 규칙은 디렉터리 하위 전체를 보호한다. */
+export function ruleMatches(p, rule) {
+  if (rule.match === "prefix") {
+    const base = rule.path.replace(/\/$/, "");
+    return p === base || p.startsWith(base + "/");
+  }
+  return p === rule.path;
+}
+
 /** 경로 목록을 보호 규칙과 대조해 가장 강한 결정을 반환. 매치 없으면 null. */
 export function evaluate(paths) {
   let matched = null;
   for (const p of paths) {
     for (const rule of PROTECTED) {
-      if (p === rule.path) {
+      if (ruleMatches(p, rule)) {
         if (!matched || (matched.decision === "ask" && rule.decision === "deny")) {
           matched = rule;
         }
