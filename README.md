@@ -67,7 +67,7 @@ node --test tests/                # 기대: hook 단위 테스트 통과
 | [.github/SECURITY.md](.github/SECURITY.md) · [CONTRIBUTING.md](CONTRIBUTING.md) · [.github/CODEOWNERS](.github/CODEOWNERS) | 공개 협업 위생 — 보안 제보·기여 가이드·코드 오너 |
 | [.github/ISSUE_TEMPLATE/](.github/ISSUE_TEMPLATE/) · [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) | 이슈·PR 템플릿(실행 표면·에이전트·Preview 상태·검증 증거 강제) |
 | [.github/workflows/codeql.yml](.github/workflows/codeql.yml) · [.github/dependabot.yml](.github/dependabot.yml) | 보안 기본선 — 정적분석(CodeQL)·의존성 업데이트 |
-| [sandbox/task-cli/](sandbox/task-cli/) · [sandbox/expense-cli/](sandbox/expense-cli/) | 하네스 dogfood 검증 앵(Task CLI · Expense CLI) + 각 세션 저널 |
+| [sandbox/task-cli/](sandbox/task-cli/) · [sandbox/expense-cli/](sandbox/expense-cli/) | 하네스 dogfood 검증 앱(Task CLI · Expense CLI) + 각 세션 저널 |
 | [examples/scenarios.md](examples/scenarios.md) | 5개 드라이런 시나리오(버그·기능·리팩터링·테스트·문서) |
 
 > **인벤토리 범위**: [feature_list.json](feature_list.json)은 **하네스 자신의 정책 자산**(agents·instructions·skills·hooks·prompts·doctor·scenarios)만 정본으로 담는다. `scripts/smoke.mjs`·`sandbox/*`·`examples/evals/`는 **검증·시연용 보조 자산**이므로 의도적으로 인벤토리 밖에 둔다(하네스 구성과 먼 생명주기를 분리).
@@ -85,8 +85,8 @@ node --test tests/                # 기대: hook 단위 테스트 통과
 - 이 저장소는 **자체 에이전트 런타임이 아니다.** SWE-agent/OpenHands처럼 sandbox·event-loop·ACI를 직접 구현하지 않는다.
 - GitHub Copilot **cloud agent는 future target**이며, `handoffs`·`web`·`todo`·hooks 동작 차이가 있으므로 별도 검증 전에는 동일 동작을 보장하지 않는다(상세: [docs/02 §3.1](docs/02-ghcp-harness-design.md)).
 - 기계적 강제는 **로컬 Agent hooks Preview**에 의존한다. 기능 비활성 환경에서는 hook이 선언적 정책으로만 작동하고 자동 차단은 일어나지 않는다.
-- **CI 하네스**(harness-doctor·hook 단위 테스트·스모크)는 [.github/workflows/harness-ci.yml](.github/workflows/harness-ci.yml)로 push·PR마다 원격 강제된다(로컬 Agent hooks Preview 의존을 보완). 다만 GitHub Copilot **cloud agent의 원격 강제**와 sandbox guardrail은 여전히 **future roadmap**이다(근거: [docs/05-decision-log.md](docs/05-decision-log.md) 보류 항목).
+- **CI 하네스**(harness-doctor·hook 단위 테스트·스모크)는 [.github/workflows/harness-ci.yml](.github/workflows/harness-ci.yml)로 push·PR마다 원격 강제된다(로컬 Agent hooks Preview 의존을 보완). 다만 GitHub Copilot **cloud agent의 원격 강제**와 sandbox guardrail은 현재 보장하지 않으며, [docs/07-deferred-backlog.md](docs/07-deferred-backlog.md)에 보류 조건을 기록한다.
 
 ## 상태
 
-`.github/` 에이전트·규칙·스킬·**hooks**, [feature_list.json](feature_list.json), [scripts/harness-doctor.mjs](scripts/harness-doctor.mjs)까지 구축되어 동작한다. 기계적 강제는 로컬 Agent hooks(Preview)와 **CI 하네스**([.github/workflows/harness-ci.yml](.github/workflows/harness-ci.yml))로 이중화된다. 향후 확장은 설계서 7장의 cloud agent 원격 강제·sandbox guardrail.
+`.github/` 에이전트·규칙·스킬·**hooks**, [feature_list.json](feature_list.json), [scripts/harness-doctor.mjs](scripts/harness-doctor.mjs)까지 구축되어 동작한다. 기계적 강제는 로컬 Agent hooks(Preview)와 **CI 하네스**([.github/workflows/harness-ci.yml](.github/workflows/harness-ci.yml))로 이중화된다. 향후 확장은 [docs/07-deferred-backlog.md](docs/07-deferred-backlog.md)의 도입 트리거를 충족할 때 재검토한다.

@@ -7,6 +7,7 @@ sandbox/*/node_modules/
 .DS_Store
 .tmp/
 tmp/
+deep-research-report.md
 
 # 에디터
 .idea/

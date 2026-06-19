@@ -3,6 +3,8 @@
 > 조사 시점: 2026-06 / GitHub Star 및 커뮤니티(레딧·HN) 언급 기준
 > 목적: GitHub Copilot(GHCP)에서 잘 작동하는 하네스를 설계하기 위한 사전 조사
 
+> 공개 사용자 안내: 이 문서는 **설계 배경 아카이브**다. 현재 하네스의 기능·사용법은 [00-harness-features.md](00-harness-features.md)와 [HOWTO-run-harness.md](HOWTO-run-harness.md)를 먼저 본다. 아래 Star·커뮤니티 수치는 조사 시점의 참고 신호이며 제품 기능 보증이나 최신 랭킹이 아니다.
+
 ---
 
 ## 0. 용어 정리: "하네스(Harness)"란?
